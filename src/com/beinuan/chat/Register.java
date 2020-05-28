@@ -37,7 +37,7 @@ import javax.swing.SwingConstants;
  * @Author Zhao Minglei
  *
  *
- * 用户注册窗口
+ *         用户注册窗口
  */
 
 public class Register extends JFrame implements ActionListener {
@@ -81,7 +81,7 @@ public class Register extends JFrame implements ActionListener {
 		rbtnMale = new JRadioButton("男", true);
 		rbtnFemale = new JRadioButton("女");
 		btngGender = new ButtonGroup();
-		btnOk = new JButton("确定(O)");
+		btnOk = new JButton("注册(O)");
 		btnOk.setMnemonic('O');
 		btnOk.setToolTipText("保存注册信息");
 		btnCancel = new JButton("返回");
@@ -237,46 +237,54 @@ public class Register extends JFrame implements ActionListener {
 	////////// "确定"按钮事件响应//////////
 	@SuppressWarnings({ "deprecation", "static-access" })
 	public void register() {
-		// 接受客户的详细资料
+		// 接收客户的详细资料
 		Register_Customer data = new Register_Customer();
-		data.custName = txtUserName.getText();
-		data.custPassword = pwdUserPassword.getText();
-		data.age = txtAge.getText();
-		data.sex = rbtnMale.isSelected() ? "男" : "女";
-		data.email = txtEmail.getText();
-		// chenmin
+		data.setUsername(txtUserName.getText());
+		data.setPassword(pwdUserPassword.getText());
+		data.setAge(txtAge.getText());
+		boolean gender = rbtnMale.isSelected();
+		if (gender) {
+			// 性别 0为男 1为女
+			data.setGender(0);
+		} else {
+			data.setGender(1);
+		}
+		data.setEmail(txtEmail.getText());
 		data.head = comboBox.getSelectedItem().toString();
 		// 验证用户名是否为空
-		if (data.custName.length() == 0) {
+		if (data.getUsername().length() == 0) {
 			JOptionPane.showMessageDialog(null, "用户名不能为空");
 			return;
 		}
 		// 验证密码是否为空
-		if (data.custPassword.length() == 0) {
+		if (data.getPassword().length() == 0) {
 			JOptionPane.showMessageDialog(null, "密码不能为空");
 			return;
 		}
 
 		// 验证密码的一致性
-		if (!data.custPassword.equals(pwdConfirmPass.getText())) {
+		if (!data.getPassword().equals(pwdConfirmPass.getText())) {
 			JOptionPane.showMessageDialog(null, "密码两次输入不一致，请重新输入");
 			return;
 		}
 
 		// 验证年龄是否为空
-		if (data.age.length() == 0) {
+		if (data.getAge() == null) {
 			JOptionPane.showMessageDialog(null, "年龄不能为空");
 			return;
 		}
 		// 验证年龄的合法性
-		int age = Integer.parseInt(txtAge.getText());
-		if (age <= 0 || age > 200) {
-			JOptionPane.showMessageDialog(null, "年龄输入不合法");
-			return;
+		if(txtAge.getText()!= null && txtAge.getText().length()!= 0 && txtAge.getText()!= "") {
+			int age = Integer.parseInt(txtAge.getText());
+			if (age <= 0 || age > 200) {
+				JOptionPane.showMessageDialog(null, "年龄输入不合法");
+				return;
+			}
 		}
+
 		// 验证Email的正确性
 		int Found_flag = 0; // 判断标志
-		for (int i = 0; i < data.email.length(); i++) {
+		for (int i = 0; i < data.getEmail().length(); i++) {
 			if (data.email.charAt(i) == '@') {
 				Found_flag++;
 			}
@@ -298,8 +306,14 @@ public class Register extends JFrame implements ActionListener {
 			String status = fromServer.readLine();
 			// 显示成功消息
 			JOptionPane op = new JOptionPane();
-			op.showMessageDialog(null, status);
-			if (status.equals(data.custName + "注册成功")) {
+			if(status == null) {
+			}else {
+				op.showMessageDialog(null, status);
+			}
+			System.out.println("状态" +status);
+			if (status.equals(data.getUsername() + "注册成功")) {
+
+				// 清空输入栏
 				txtUserName.setText("");
 				pwdUserPassword.setText("");
 				pwdConfirmPass.setText("");

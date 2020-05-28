@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Vector;
 
+import com.beinuan.db.baseconn.BaseConn;
+
 /**
  * @Time 2020年5月8日
  * @Author Zhao Minglei
@@ -132,15 +134,14 @@ public class Connection extends Thread {
 			FileInputStream file3 = new FileInputStream("config\\user.txt");
 			ObjectInputStream objInput1 = new ObjectInputStream(file3);
 			vList = (Vector) objInput1.readObject();
-
 			// 查找判断标志
 			int find = 0;
 			for (int i = 0; i < vList.size(); i++) {
 				Register_Customer reg = (Register_Customer) vList.elementAt(i);
 
-				if (reg.custName.equals(clientMessage2.custName)) {
+				if (reg.getUsername().equals(clientMessage2.custName)) {
 					find = 1;
-					if (!reg.custPassword.equals(clientMessage2.custPassword)) {
+					if (!reg.getPassword().equals(clientMessage2.custPassword)) {
 						toClient.println("密码不正确");
 						break;
 					} else {
@@ -223,11 +224,12 @@ public class Connection extends Thread {
 				// 判断是否有重名
 				for (int i = 0; i < vList.size(); i++) {
 					Register_Customer reg = (Register_Customer) vList.elementAt(i);
-					if (reg.custName.equals(clientMessage.custName)) {
+					System.out.println(reg);
+					if (reg.getUsername().equals(clientMessage.getUsername())) {
 						toClient.println("注册名重复,请另外选择");
 						flag = 1;
 						break;
-					} else if (reg.custName.equals("所有人")) {
+					} else if (reg.getUsername().equals("所有人")) {
 						toClient.println("禁止使用此注册名,请另外选择");
 						flag = 1;
 						break;
@@ -243,9 +245,9 @@ public class Connection extends Thread {
 				objout.writeObject(vList);
 
 				// 发送注册成功信息
-				toClient.println(clientMessage.custName + "注册成功");
+				toClient.println(clientMessage.getUsername() + "注册成功");
 				Date t = new Date();
-				log("用户" + clientMessage.custName + "注册成功, " + "注册时间:" + t.toLocaleString() + "\n");
+				log("用户" + clientMessage.getUsername() + "注册成功, " + "注册时间:" + t.toLocaleString() + "\n");
 				file.close();
 				objout.close();
 				fromClient.close();
